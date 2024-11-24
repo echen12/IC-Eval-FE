@@ -2,7 +2,9 @@
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 @using MudBlazor
+@inject HttpClient Http
 
+<MudText Typo="Typo.h4">@formTitle</MudText>
 <MudGrid>
     <MudItem xs="12" sm="7">
         <MudPaper Class="pa-4">
@@ -50,9 +52,33 @@
 
 @code {
     bool success;
+    private string formTitle = string.Empty;
     string[] errors = { };
     MudTextField<string> pwField1;
     MudForm form;
+
+    private List<FormField> formFields = new List<FormField>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await Http.GetFromJsonAsync<FormModel>("data");
+
+        try
+        {
+            if (response != null)
+            {
+                formTitle = response.Title;
+                formFields = response.Fields;
+
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching from server: {ex.Message}");
+        }
+
+        
+    }
 
     private IEnumerable<string> PasswordStrength(string pw)
     {
@@ -96,12 +122,25 @@
     {
         try
         {
-            // await api call here
+            
+            var response = await Http.GetFromJsonAsync<FormModel>("data");
+
+            if (response != null)
+            {
+                
+                formTitle = response.Title;
+                formFields = response.Fields;
+
+                
+                StateHasChanged();  
+            }
         }
         catch (Exception ex)
         {
             
+            Console.WriteLine($"Error fetching form config: {ex.Message}");
         }
     }
+}
 
 }
