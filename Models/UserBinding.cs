@@ -7,8 +7,8 @@ public class UserBindings
     public string? UserEmail { get; set; }  
     public string? UserNumber { get; set; }  
     public string? UserDropDown { get; set; }  
-    public bool UserRequired { get; set; } = false;  
-    public string? UserColor { get; set; }
+    public bool UserRequired { get; set; } = false;
+    public string UserColor { get; set; } = "#060412ff";
     public DateTime? UserDate { get; set; }   
 
     public DateTime? UserDateTime { get; set; }  
