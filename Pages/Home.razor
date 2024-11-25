@@ -10,7 +10,7 @@
 <MudGrid>
     <MudItem xs="12" sm="7">
         <MudPaper Class="pa-4">
-            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" OnInvalidSubmit="HandleInvalidSubmit">
                 @foreach (var field in formFields)
                 {
                     <MudItem>
@@ -20,9 +20,9 @@
             </MudForm>
         </MudPaper>
         <MudPaper Class="pa-4 mt-4">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="false" OnClick="HandleValidSubmit">Submit Form</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="false" OnClick="HandleValidSubmit" >Submit Form</MudButton>
             <MudButton Variant="Variant.Filled" Color="Color.Secondary" DropShadow="false" OnClick="FetchFormConfig" Class="mx-2">Update Form Config</MudButton>
-            <MudButton Variant="Variant.Filled" DropShadow="false" OnClick="ClearForm">Clear Form</MudButton>
+            
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="5">
