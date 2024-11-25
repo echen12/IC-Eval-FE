@@ -15,6 +15,7 @@
 - **FE-9**: Abstract away fragment creation into separate functions.
 - **FE-10**: Email formatting.
 - **FE-11**: Code cleanup.
+- **BF-1**: Prevent dropdown/radio buttons from forming if values don't exist.
 
 
 ## Assumptions:
