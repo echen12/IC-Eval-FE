@@ -10,4 +10,5 @@
 - **FE-4**: Create models based on json structure.
 - **FE-5**: Try API call from backend.
 - **FE-6**: Figure out how to dynamically create form fields as components.
+- **FE-7**: Figure out how to convert user inputs into json response.
 
