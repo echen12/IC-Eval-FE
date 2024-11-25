@@ -34,10 +34,10 @@
    - Follow the steps in the [IC-Eval-Backend GitHub repository](https://github.com/echen12/IC-Eval-Backend) to run the backend first.
 
 2. **Clone the Application:**
-   - Clone the Blazor WebAssembly (WASM) application to your local machine.
+   - Clone this application to your local machine.
 
 3. **Build the Application:**
-   - Navigate to the application directory.
+   - Navigate to the application folder.
    - Open the .sln file in Visual Studio.
    - Run the following command in Developer Powershell to build the application:
      ```bash
