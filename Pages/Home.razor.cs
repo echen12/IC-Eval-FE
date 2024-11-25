@@ -4,14 +4,16 @@ using System.Text.RegularExpressions;
 using System.Net.Http.Json;
 using System.Text.Json;
 using IC_Eval_FE.FragmentFactory;
+using IC_Eval_FE.Services.Helper_Functions;
 
 
-namespace IC_Eval_FE.Pages  
+namespace IC_Eval_FE.Pages
 {
     public partial class Home : ComponentBase
     {
 
         protected bool success;
+        private bool isRequired;
         private string formTitle = string.Empty;
         string[] errors = { };
         protected string jsonResponse;
@@ -19,6 +21,8 @@ namespace IC_Eval_FE.Pages
         MudForm form;
 
         UserBindings userBindings = new();
+
+        Validation validation = new Validation();
 
         private List<FormField> formFields = new List<FormField>();
 
@@ -37,6 +41,20 @@ namespace IC_Eval_FE.Pages
                     formTitle = response.Title;
                     formFields = response.Fields;
 
+                    // Check if the email field exists and if it's required
+                    var emailField = response.Fields.FirstOrDefault(f => f.Type == "email");
+
+                    if (emailField != null)
+                    {
+                        // Set a flag if the email field is required
+                        isRequired = emailField.Required;
+                        // You can now use isEmailRequired flag to conditionally handle email validation or form behavior
+                    }
+                    else
+                    {
+                        // Handle the case where no email field exists if necessary
+                        isRequired = false;
+                    }
                 }
             }
             catch (Exception ex)
@@ -159,6 +177,17 @@ namespace IC_Eval_FE.Pages
 
         private void HandleValidSubmit()
         {
+
+            bool isEmailValid = validation.ValidateEmail(userBindings.UserEmail);
+            
+
+            if (!isEmailValid && isRequired)
+            {
+                
+                jsonResponse = "Invalid Email!";
+                return;
+            }
+
             form.Validate();
             if (form.IsValid)
             {
@@ -167,11 +196,6 @@ namespace IC_Eval_FE.Pages
 
             }
 
-        }
-
-        private void ClearForm()
-        {
-            form.ResetAsync();
         }
 
         public async Task FetchFormConfig()
@@ -197,5 +221,7 @@ namespace IC_Eval_FE.Pages
                 Console.WriteLine($"Error fetching form config: {ex.Message}");
             }
         }
+
+
     }
 }

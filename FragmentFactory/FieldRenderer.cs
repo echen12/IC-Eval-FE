@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using System.ComponentModel.DataAnnotations;
+using IC_Eval_FE.Services.Helper_Functions;
 
 namespace IC_Eval_FE.FragmentFactory
 {
     public class FieldRenderer
     {
+        public Validation validation = new Validation();
         public void RenderTextField(RenderTreeBuilder builder, FormField field, UserBindings userBindings, Dictionary<string, object> formDataToJson)
 
         {
@@ -16,8 +19,26 @@ namespace IC_Eval_FE.FragmentFactory
 
         public void RenderEmailField(RenderTreeBuilder builder, FormField field, UserBindings userBindings, Dictionary<string, object> formDataToJson)
         {
-            builder.AddAttribute(6, "Value", userBindings.UserEmail);
-            builder.AddAttribute(7, "ValueChanged", EventCallback.Factory.Create<string>(this, value => userBindings.UserEmail = value));
+            bool isEmailValid = true;
+            bool isRequired = field.Required;
+
+            if (isRequired && !string.IsNullOrEmpty(userBindings.UserEmail))
+            {
+                isEmailValid = validation.ValidateEmail(userBindings.UserEmail); 
+            }
+
+
+            builder.AddAttribute(1, "Value", userBindings.UserEmail); 
+            builder.AddAttribute(2, "ValueChanged", EventCallback.Factory.Create<string>(this, value =>
+            {
+                userBindings.UserEmail = value; 
+            }));
+
+            
+            builder.AddAttribute(3, "Error", !isEmailValid && isRequired);  
+            builder.AddAttribute(4, "ErrorText", !isEmailValid && isRequired ? "Invalid email format" : null);  
+
+            
             formDataToJson[field.Label] = userBindings?.UserEmail ?? "";
         }
 
@@ -117,7 +138,7 @@ namespace IC_Eval_FE.FragmentFactory
         public void RenderColorField(RenderTreeBuilder builder, FormField field, UserBindings userBindings, Dictionary<string, object> formDataToJson)
         {
             builder.AddAttribute(38, "Text", userBindings.UserColor);
-            builder.AddAttribute(39, "TextChanged", EventCallback.Factory.Create<string>(this, value => userBindings.UserColor = value));
+            //builder.AddAttribute(39, "TextChanged", EventCallback.Factory.Create<string>(this, value => userBindings.UserColor = value));
             formDataToJson[field.Label] = userBindings?.UserColor ?? "";
         }
     }
