@@ -2,6 +2,7 @@
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 @using MudBlazor
+@using System.Text.Json;
 @inject HttpClient Http
 
 <MudText Typo="Typo.h4">@formTitle</MudText>
@@ -25,11 +26,11 @@
     </MudItem>
     <MudItem xs="12" sm="5">
         <MudPaper Class="pa-4 mud-height-full">
-            <MudText Typo="Typo.subtitle2">@($"Errors ({errors.Length})")</MudText>
-            @foreach (var error in errors)
+            <MudText Typo="Typo.subtitle2">@jsonResponse</MudText>
+            @* @foreach (var error in errors)
             {
                 <MudText Color="@Color.Error">@error</MudText>
-            }
+            } *@
         </MudPaper>
     </MudItem>
 </MudGrid>
@@ -40,12 +41,15 @@
     bool success;
     private string formTitle = string.Empty;
     string[] errors = { };
+    string jsonResponse;
     MudTextField<string> pwField1;
     MudForm form;
 
     UserBindings userBindings = new();
 
     private List<FormField> formFields = new List<FormField>();
+
+    private Dictionary<string, object> formDataToJson = new Dictionary<string, object>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,7 +69,7 @@
             Console.WriteLine($"Error fetching from server: {ex.Message}");
         }
 
-        
+
     }
 
     private IEnumerable<string> PasswordStrength(string pw)
@@ -117,46 +121,47 @@
     // Dynamically add attributes
     private RenderFragment RenderField(FormField field) => builder =>
     {
-        
+
         builder.OpenComponent(0, GetFieldComponentType(field.Type));
         builder.AddAttribute(1, "Label", field.Label);
         builder.AddAttribute(2, "Required", field.Required);
         builder.AddAttribute(3, "Class", "mud-width-full");
 
-        
+
         switch (field.Type)
         {
 
             case "text":
-                builder.AddAttribute(6, "Value", userBindings.UserText);  
-                builder.AddAttribute(7, "ValueChanged", EventCallback.Factory.Create<string>(this, value => userBindings.UserText = value)); // Update on change
+                builder.AddAttribute(4, "Value", userBindings.UserText);  
+                builder.AddAttribute(5, "ValueChanged", EventCallback.Factory.Create<string>(this, value => userBindings.UserText = value));
+                formDataToJson[field.Label] = userBindings?.UserText ?? "";
                 break;
 
             case "email":
                 builder.AddAttribute(6, "Value", userBindings.UserEmail);
-                builder.AddAttribute(7, "ValueChanged", EventCallback.Factory.Create<string>(this, value => userBindings.UserEmail = value)); // Update on change
+                builder.AddAttribute(7, "ValueChanged", EventCallback.Factory.Create<string>(this, value => userBindings.UserEmail = value));
+                formDataToJson[field.Label] = userBindings?.UserEmail ?? "";
                 break;
 
             case "number":
-                builder.AddAttribute(4, "Min", field.Min);
-                builder.AddAttribute(5, "Max", field.Max);
-                builder.AddAttribute(6, "Value", userBindings.UserNum);
-                builder.AddAttribute(7, "ValueChanged", EventCallback.Factory.Create<int>(this, value => userBindings.UserNum = value)); // Update on change
+                builder.AddAttribute(8, "Min", field.Min);
+                builder.AddAttribute(9, "Max", field.Max);
+                builder.AddAttribute(10, "Value", userBindings.UserNum);
+                builder.AddAttribute(11, "ValueChanged", EventCallback.Factory.Create<int>(this, value => userBindings.UserNum = value)); 
+                formDataToJson[field.Label] = userBindings.UserNum;
                 break;
 
             case "dropdown":
-                builder.AddAttribute(6, "Value", userBindings.UserDropDown);
-                builder.AddAttribute(7, "ValueChanged", EventCallback.Factory.Create<string>(this, value => userBindings.UserDropDown = value));  // Update on change
-
-                
-
-                builder.AddAttribute(6, "ChildContent", (RenderFragment)(dropdownBuilder =>
+                builder.AddAttribute(12, "Value", userBindings.UserDropDown);
+                builder.AddAttribute(13, "ValueChanged", EventCallback.Factory.Create<string>(this, value => userBindings.UserDropDown = value));  
+                formDataToJson[field.Label] = userBindings?.UserDropDown ?? "";
+                builder.AddAttribute(14, "ChildContent", (RenderFragment)(dropdownBuilder =>
             {
                 foreach (var state in field.Values)
                 {
                     dropdownBuilder.OpenComponent<MudSelectItem<string>>(0);
-                    dropdownBuilder.AddAttribute(1, "Value", state);
-                    dropdownBuilder.AddAttribute(2, "ChildContent", (RenderFragment)(itemBuilder =>
+                    dropdownBuilder.AddAttribute(15, "Value", state);
+                    dropdownBuilder.AddAttribute(16, "ChildContent", (RenderFragment)(itemBuilder =>
                     {
                         itemBuilder.AddContent(0, state);
                     }));
@@ -166,61 +171,68 @@
                 break;
 
             case "checkbox":
-                builder.AddAttribute(4, "Checked", userBindings.UserRequired); // Bind checkbox value
-                builder.AddAttribute(5, "ValueChanged", EventCallback.Factory.Create<bool>(this, value => userBindings.UserRequired = value));
+                builder.AddAttribute(17, "Checked", userBindings.UserRequired); 
+                builder.AddAttribute(18, "ValueChanged", EventCallback.Factory.Create<bool>(this, value => userBindings.UserRequired = value));
+                formDataToJson[field.Label] = userBindings.UserRequired;
                 break;
 
             case "date":
-                builder.AddAttribute(8, "Value", userBindings.UserDate);
-                builder.AddAttribute(9, "DateChanged", EventCallback.Factory.Create<DateTime?>(this, value => userBindings.UserDate = value));
+                builder.AddAttribute(19, "Value", userBindings.UserDate);
+                builder.AddAttribute(20, "DateChanged", EventCallback.Factory.Create<DateTime?>(this, value => userBindings.UserDate = value));
+                formDataToJson[field.Label] = userBindings?.UserDate ?? DateTime.MinValue;
                 break;
 
             case "datetime":
-                builder.AddAttribute(10, "Value", userBindings.UserDateTime);
-                builder.AddAttribute(11, "DateChanged", EventCallback.Factory.Create<DateTime?>(this, value => userBindings.UserDateTime = value));
+                builder.AddAttribute(21, "Value", userBindings.UserDateTime);
+                builder.AddAttribute(22, "DateChanged", EventCallback.Factory.Create<DateTime?>(this, value => userBindings.UserDateTime = value));
+                formDataToJson[field.Label] = userBindings?.UserDate ?? DateTime.MinValue;
                 break;
 
             case "time":
-                builder.AddAttribute(12, "Time", userBindings.UserTime);
-                builder.AddAttribute(19, "AmPm", true);
-                builder.AddAttribute(21, "Direction", Direction.Top);
-                builder.AddAttribute(13, "TimeChanged", EventCallback.Factory.Create<TimeSpan?>(this, value => userBindings.UserTime = value));
+                builder.AddAttribute(23, "Time", userBindings.UserTime);
+                builder.AddAttribute(24, "AmPm", true);
+                builder.AddAttribute(25, "Direction", Direction.Top);
+                builder.AddAttribute(26, "TimeChanged", EventCallback.Factory.Create<TimeSpan?>(this, value => userBindings.UserTime = value));
+                formDataToJson[field.Label] = userBindings?.UserTime ?? TimeSpan.Zero;
                 break;
 
             case "range":
-                builder.AddAttribute(14, "Value", userBindings.UserRange);
-                builder.AddAttribute(15, "Min", field.Min);
-                builder.AddAttribute(16, "Max", field.Max);
-                builder.AddAttribute(17, "ValueChanged", EventCallback.Factory.Create<int>(this, value => userBindings.UserRange = value));
-                builder.AddAttribute(18, "Color", Color.Info);
-                builder.AddAttribute(19, "ChildContent", (RenderFragment)((builder2) =>
+                builder.AddAttribute(27, "Value", userBindings.UserRange);
+                builder.AddAttribute(28, "Min", field.Min);
+                builder.AddAttribute(29, "Max", field.Max);
+                builder.AddAttribute(30, "ValueChanged", EventCallback.Factory.Create<int>(this, value => userBindings.UserRange = value));
+                builder.AddAttribute(31, "Color", Color.Info);
+                builder.AddAttribute(32, "ChildContent", (RenderFragment)((builder2) =>
                 {
                     builder2.AddContent(0, $"{field.Label}: {userBindings.UserRange}");
-                }));                
+                }));
+                formDataToJson[field.Label] = userBindings?.UserRange ?? 0;
                 break;
 
             case "radio":
-                builder.AddAttribute(18, "Value", userBindings.UserRadio);
-                builder.AddAttribute(19, "ValueChanged", EventCallback.Factory.Create<string>(this, value => userBindings.UserRadio = value));
+                builder.AddAttribute(33, "Value", userBindings.UserRadio);
+                builder.AddAttribute(34, "ValueChanged", EventCallback.Factory.Create<string>(this, value => userBindings.UserRadio = value));
 
-                builder.AddAttribute(20, "ChildContent", (RenderFragment)(radioBuilder =>
+                builder.AddAttribute(35, "ChildContent", (RenderFragment)(radioBuilder =>
             {
                 foreach (var option in field.Values)
                 {
                     radioBuilder.OpenComponent<MudRadio<string>>(0);
-                    radioBuilder.AddAttribute(1, "Value", option);
-                    radioBuilder.AddAttribute(2, "ChildContent", (RenderFragment)(itemBuilder =>
+                    radioBuilder.AddAttribute(36, "Value", option);
+                    radioBuilder.AddAttribute(37, "ChildContent", (RenderFragment)(itemBuilder =>
                     {
                         itemBuilder.AddContent(0, option);
                     }));
                     radioBuilder.CloseComponent();
                 }
-            }));                
+            }));
+                formDataToJson[field.Label] = userBindings?.UserRadio ?? "";
                 break;
 
             case "color":
-                builder.AddAttribute(8, "Value", userBindings.UserColor);
-                builder.AddAttribute(9, "TextChanged", EventCallback.Factory.Create<string?>(this, value => userBindings.UserColor = value));
+                builder.AddAttribute(38, "Text", userBindings.UserColor);
+                builder.AddAttribute(39, "TextChanged", EventCallback.Factory.Create<string>(this, value => userBindings.UserColor = value));
+                formDataToJson[field.Label] = userBindings?.UserColor ?? "";
                 break;
 
             default:
@@ -236,6 +248,9 @@
         form.Validate();
         if (form.IsValid)
         {
+            
+            jsonResponse = JsonSerializer.Serialize(formDataToJson);
+            
         }
 
     }
