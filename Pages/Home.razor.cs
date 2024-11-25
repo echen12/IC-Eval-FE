@@ -106,6 +106,11 @@ namespace IC_Eval_FE.Pages
         private RenderFragment RenderField(FormField field) => builder =>
         {
 
+            if ((field.Type == AppStrings.dropdown || field.Type == AppStrings.radio) && (field.Values == null || !field.Values.Any()))
+            {
+                return;  
+            }
+
             builder.OpenComponent(0, GetFieldComponentType(field.Type)); 
             builder.AddAttribute(1, AppStrings.Label, field.Label); 
             builder.AddAttribute(2, AppStrings.Required, field.Required); 
@@ -151,7 +156,9 @@ namespace IC_Eval_FE.Pages
                     break;
 
                 case AppStrings.radio:
+                    
                     fieldRenderer.RenderRadioField(builder, field, userBindings, formDataToJson);
+                    
                     break;
 
                 case AppStrings.color:
