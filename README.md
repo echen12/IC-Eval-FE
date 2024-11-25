@@ -36,17 +36,31 @@
    - Clone the Blazor WebAssembly (WASM) application to your local machine.
 
 3. **Build the Application:**
-   - Open a developer PowerShell or terminal window.
    - Navigate to the application directory.
-   - Run the following command to build the application:
+   - Open the .sln file in Visual Studio.
+   - Run the following command in Developer Powershell to build the application:
      ```bash
      dotnet build
      ```
 
 4. **Run the Application:**
-   - Start the application with live reload using `dotnet watch`:
+   - Start the application with live reload in Developer Powershell using `dotnet watch`:
      ```bash
      dotnet watch
      ```
 
+5. **If successful, you should see the form.**
+
+![Local Image](images/form.png)
+
+## How it works:
+- Some form fields are required so you must fill those in before submitting.
+![Local Image](images/form_1.png)
+
+
+- To update how the form is configured, press this button here (your backend must be running and you must have a new valid form configuration json file):
+![Local Image](images/form_2.png)
+
+- If the fields have been entered correctly, once you submit the form, the JSON response will appear as a string on the right side of the screen.
+![Local Image](images/form_3.png)
 ---
