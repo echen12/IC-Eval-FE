@@ -21,6 +21,9 @@
 - The JSON file is always a valid form configuration.
 - No file uploads are allowed since it's difficult to represent in a user response JSON.
 
+# Architecture/Design
+![Local Image](images/design.png)
+
 ## Steps to Run the Application:
 
 1. **Run the Backend:**
