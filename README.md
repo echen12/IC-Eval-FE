@@ -2,7 +2,7 @@
 
 # Development Tasks (Cross reference with appropriate branch):
 
-## Frontend (FE)
+## Frontend (FE), Bug Fix (BF)
 
 - **FE-1**: Clear default pages in Blazor to prep for form development.
 - **FE-2**: Install MudBlazor packages and other required packages.
