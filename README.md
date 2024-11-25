@@ -13,3 +13,5 @@
 - **FE-7**: Figure out how to convert user inputs into json response.
 - **FE-8**: Refactor code behind and abstract away functions if neccesary.
 - **FE-9**: Abstract away fragment creation into separate functions.
+- **FE-10**: Email formatting.
+- **FE-11**: Code cleanup.
