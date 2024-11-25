@@ -22,6 +22,9 @@
 - No file uploads are allowed since it's difficult to represent in a user response JSON.
 
 # Architecture/Design
+- Focused on serving a static JSON file from the Minimal API
+- Didn't create endpoint to send JSON file to.
+
 ![Local Image](images/design.png)
 
 ## Steps to Run the Application:
