@@ -1,0 +1,49 @@
+﻿<MudSelect T="string" @bind-Value="SelectedValue" Label="@Label" Variant="Variant.Text" Required="@Required">
+    @if (Values != null)
+
+    {
+        @foreach (var value in Values)
+
+        {
+            <MudSelectItem T="string" Value="@value">@value</MudSelectItem>
+        }
+    }
+    </MudSelect>
+
+    @code {
+    [Parameter]
+    public string Label { get; set; } = "";
+
+
+    [Parameter]
+    public bool Required { get; set; }
+
+
+    [Parameter]
+    public IEnumerable<string>? Values { get; set; }
+
+
+    [Parameter]
+    public Dictionary<string, object> formDataToJson { get; set; } = new();
+
+
+    public string SelectedValue
+    {
+        get
+        {
+            if (formDataToJson.TryGetValue(Label, out var value) && value is string strValue)
+            {
+                return strValue;
+            }
+
+            return Values?.FirstOrDefault() ?? string.Empty;
+
+        }
+
+        set
+        {
+            formDataToJson[Label] = value;
+        }
+
+    }
+}

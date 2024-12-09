@@ -1,0 +1,28 @@
+﻿<MudTimePicker @bind-Time="SelectedTime" Label="@Label" Required="@Required" AmPm="true" />
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = "";
+
+    [Parameter]
+    public bool Required { get; set; }
+
+    [Parameter]
+    public Dictionary<string, object> formDataToJson { get; set; } = new();
+
+
+    private TimeSpan? SelectedTime
+    {
+        get
+        {
+            if (formDataToJson.TryGetValue(Label, out var value) && value is TimeSpan timeValue) return timeValue;
+            return null;
+        }
+
+        set
+        {
+            formDataToJson[Label] = value;
+        }
+
+    }
+}

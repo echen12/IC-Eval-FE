@@ -1,0 +1,32 @@
+﻿<MudCheckBox T="bool" @bind-Value="CheckedValue" Label="@Label" Required="@Required"></MudCheckBox>
+
+@code {
+
+
+    [Parameter]
+    public string Label { get; set; } = "";
+
+    [Parameter]
+    public Dictionary<string, object> formDataToJson { get; set; } = new();
+
+    [Parameter]
+    public bool Required { get; set; }
+
+
+    public bool CheckedValue
+    {
+        get
+        {
+            if (formDataToJson.TryGetValue(Label, out var value) && value is bool boolValue)
+            {
+                return boolValue;
+            }
+            return false;
+        }
+
+        set
+        {
+            formDataToJson[Label] = value;
+        }
+    }
+}

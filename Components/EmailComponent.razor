@@ -1,0 +1,35 @@
+﻿@using MudBlazor
+
+<MudTextField @bind-Value="BoundValue" Label="@Label" Variant="Variant.Text" Required="@Required">
+</MudTextField>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = "";
+
+    [Parameter]
+    public bool Required { get; set; }
+
+    [Parameter]
+    public Dictionary<string, object> formDataToJson { get; set; } = new();
+
+    public string BoundValue
+    {
+        get
+        {
+            if (formDataToJson.TryGetValue(Label, out var value))
+            {
+                return value?.ToString() ?? string.Empty;
+            }
+
+            formDataToJson[Label] = string.Empty;
+            return string.Empty;
+        }
+
+        set
+        {
+            formDataToJson[Label] = value;
+        }
+
+    }
+}

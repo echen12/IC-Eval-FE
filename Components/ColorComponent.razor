@@ -1,0 +1,37 @@
+﻿<MudColorPicker @bind-Text="UserColor" Label="@Label" Required="@Required" />
+
+@code {
+    
+
+    [Parameter]
+    public string Label { get; set; } = "";
+
+
+    [Parameter]
+    public bool Required { get; set; }
+
+
+    [Parameter]
+    public Dictionary<string, object> formDataToJson { get; set; } = new();
+
+
+    public string UserColor
+    {
+        get
+        {
+            if (formDataToJson.TryGetValue(Label, out var value) && value is string colorValue)
+            {
+                return colorValue;
+            }
+
+            formDataToJson[Label] = string.Empty;
+            return string.Empty;
+        }
+
+        set
+        {
+            formDataToJson[Label] = value; 
+        }
+
+    }
+}

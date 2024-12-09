@@ -1,0 +1,39 @@
+﻿<MudSlider T="int" @bind-Value="UserRange" Min="@Min" Max="@Max" Color="Color.Info">
+    @Label: @UserRange.ToString()
+</MudSlider>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = "";
+
+    [Parameter]
+    public int Min { get; set; }
+
+    [Parameter]
+    public int Max { get; set; }
+
+    [Parameter]
+    public bool Required { get; set; }
+
+    [Parameter]
+    public Dictionary<string, object> formDataToJson { get; set; } = new();
+
+
+    public int UserRange
+    {
+        get
+        {
+            if (formDataToJson.TryGetValue(Label, out var value) && value is int rangeValue)
+            {
+                return rangeValue;
+            }
+
+            return Min; 
+        }
+
+        set
+        {
+            formDataToJson[Label] = value;
+        }
+    }
+}

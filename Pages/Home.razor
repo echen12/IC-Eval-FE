@@ -3,26 +3,38 @@
 @using System.ComponentModel.DataAnnotations
 @using MudBlazor
 @using System.Text.Json;
-@using IC_Eval_FE
+@using IC_Eval_FE;
+@using IC_Eval_FE.Components;
 @inject HttpClient Http
 
 <MudText Typo="Typo.h4">@formTitle</MudText>
-@if (isErrorFetchingConfig)
+@*
+    @if (isErrorFetchingConfig)
 {
     <MudAlert Severity="MudBlazor.Severity.Error">
         @errorMessage
     </MudAlert>
 }
+*@
+
 <MudGrid>
     <MudItem xs="12" sm="7">
         <MudPaper Class="pa-4">
             <MudForm @ref="form" @bind-IsValid="@success" OnInvalidSubmit="HandleInvalidSubmit">
+
+                
                 @foreach (var field in formFields)
                 {
-                    <MudItem>
-                        @RenderField(field)
-                    </MudItem>
+                <MudItem>
+                @RenderField(field)
+                </MudItem>
                 }
+                
+                
+
+                 
+
+
             </MudForm>
         </MudPaper>
         <MudPaper Class="pa-4 mt-4">

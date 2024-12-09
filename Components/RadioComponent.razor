@@ -1,0 +1,42 @@
+﻿<MudRadioGroup @bind-Value="UserRadio" Label="@Label">
+    @if (Values != null)
+
+    {
+        @foreach (var option in Values)
+
+        {
+            <MudRadio Value="@option">@option</MudRadio>
+        }
+    }
+    </MudRadioGroup>
+
+    @code {
+    [Parameter]
+    public string Label { get; set; } = "";
+
+    [Parameter]
+    public IEnumerable<string>? Values { get; set; }
+
+    [Parameter]
+    public bool Required { get; set; }
+
+    [Parameter]
+    public Dictionary<string, object> formDataToJson { get; set; } = new();
+
+
+
+    public string UserRadio
+    {
+        get
+        {
+            if (formDataToJson.TryGetValue(Label, out var value) && value is string radioValue) return radioValue;
+            return string.Empty;
+        }
+
+        set
+        {
+            formDataToJson[Label] = value;
+        }
+
+    }
+}

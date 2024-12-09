@@ -1,0 +1,34 @@
+﻿
+
+<MudDatePicker @bind-Date="SelectedDate" Label="@Label" Required="@Required" />
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = ""; 
+
+
+    [Parameter]
+    public bool Required { get; set; } 
+
+
+    [Parameter]
+    public Dictionary<string, object> formDataToJson { get; set; } = new(); 
+
+
+    private DateTime? SelectedDate
+    {
+        get
+        {
+            if (formDataToJson.TryGetValue(Label, out var value) && value is DateTime dateValue)
+            {
+                return dateValue; 
+            }
+            return null; 
+        }
+
+        set
+        {
+            formDataToJson[Label] = value;
+        }
+    }
+}

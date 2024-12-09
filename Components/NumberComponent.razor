@@ -1,0 +1,37 @@
+﻿<MudNumericField @bind-Value="BoundValue" Label="@Label" Required="@Required" Variant="Variant.Text" Min="@Min" Max="@Max"></MudNumericField>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = "";
+
+    [Parameter]
+    public bool Required { get; set; }
+
+    [Parameter]
+    public int Min { get; set; }
+
+    [Parameter]
+    public int Max { get; set; }
+
+    [Parameter]
+    public Dictionary<string, object> formDataToJson { get; set; } = new();
+
+    public int BoundValue
+    {
+        get
+        {
+            if (formDataToJson.TryGetValue(Label, out var value) && value is int intValue)
+            {
+                return intValue;
+            }
+
+            return 0;
+        }
+
+        set
+        {
+            formDataToJson[Label] = value;
+        }
+
+    }
+}
