@@ -2,9 +2,8 @@
 using MudBlazor;
 using System.Net.Http.Json;
 using System.Text.Json;
-using IC_Eval_FE.FragmentFactory;
 using IC_Eval_FE.Services.Helper_Functions;
-using Microsoft.VisualBasic.FileIO;
+using IC_Eval_FE.Components;
 
 
 namespace IC_Eval_FE.Pages
@@ -30,10 +29,9 @@ namespace IC_Eval_FE.Pages
 
         // Form fields and data
         private List<FormField> formFields = new List<FormField>();
-        private Dictionary<string, object> formDataToJson = new Dictionary<string, object>();
+        private Dictionary<string, object?> formDataToJson = new Dictionary<string, object?>();
 
-        // FieldRenderer instance for dynamic field rendering
-        private FieldRenderer fieldRenderer = new FieldRenderer();
+        
 
         protected override async Task OnInitializedAsync()
         {
@@ -45,6 +43,18 @@ namespace IC_Eval_FE.Pages
                 {
                     formTitle = response.Title;
                     formFields = response.Fields;
+
+                    formDataToJson = formFields.ToDictionary(
+                        field => field.Label,
+                        field => field.Type switch
+                        {
+                            "text" => (object)string.Empty,       
+                            "number" => (object)0,               
+                            "checkbox" => (object)false,         
+                            "dropdown" => null,         
+                            _ => null
+                        }
+                        );
 
 
                     var emailField = response.Fields.FirstOrDefault(f => f.Type == AppStrings.Email);
@@ -80,106 +90,63 @@ namespace IC_Eval_FE.Pages
 
         }
 
-        // Determine type of Mud fragment required
-        private Type GetFieldComponentType(string type)
+        private Type GetComponentType(string type)
         {
             return type switch
             {
-                AppStrings.text => typeof(MudTextField<string>),
-                AppStrings.email => typeof(MudTextField<string>),
-                AppStrings.number => typeof(MudNumericField<int>),
-                AppStrings.dropdown => typeof(MudSelect<string>),
-                AppStrings.checkbox => typeof(MudCheckBox<bool>),
-                AppStrings.date => typeof(MudDatePicker),
-                AppStrings.datetime => typeof(MudDatePicker),
-                AppStrings.time => typeof(MudTimePicker),
-                AppStrings.textarea => typeof(MudTextField<string>),
-                AppStrings.range => typeof(MudSlider<int>),
-                AppStrings.color => typeof(MudColorPicker),
-                AppStrings.radio => typeof(MudRadioGroup<string>),
-
-                _ => typeof(MudTextField<string>) // Default case
+                AppStrings.text => typeof(TextComponent),
+                AppStrings.email => typeof(EmailComponent),
+                AppStrings.number => typeof(NumberComponent),
+                AppStrings.dropdown => typeof(DropDownComponent),
+                AppStrings.checkbox => typeof(CheckboxComponent),
+                AppStrings.date => typeof(DateComponent),
+                AppStrings.datetime => typeof(DatetimeComponent),
+                AppStrings.time => typeof(TimeComponent),
+                AppStrings.range => typeof(RangeComponent),
+                AppStrings.radio => typeof(RadioComponent),
+                AppStrings.color => typeof(ColorComponent),
+                AppStrings.textarea => typeof(TextAreaComponent),
+                _ => throw new ArgumentException($"Unsupported field type: {type}")
             };
         }
 
-        // Dynamically add attributes
         private RenderFragment RenderField(FormField field) => builder =>
         {
+            builder.OpenRegion(0); 
+            builder.OpenComponent(0, GetComponentType(field.Type)); 
 
-            if ((field.Type == AppStrings.dropdown || field.Type == AppStrings.radio) && (field.Values == null || !field.Values.Any()))
+            builder.AddAttribute(1, "Label", field.Label);
+            builder.AddAttribute(2, "Required", field.Required);
+            builder.AddAttribute(3, "formDataToJson", formDataToJson);
+
+            if (field.Type == AppStrings.number || field.Type == AppStrings.range)
             {
-                return;  
+                builder.AddAttribute(4, "Min", field.Min);
+                builder.AddAttribute(5, "Max", field.Max);
             }
 
-            builder.OpenComponent(0, GetFieldComponentType(field.Type)); 
-            builder.AddAttribute(1, AppStrings.Label, field.Label); 
-            builder.AddAttribute(2, AppStrings.Required, field.Required); 
-            builder.AddAttribute(3, AppStrings.Class, "mud-width-full");
-
-
-            switch (field.Type)
+            if (field.Type == AppStrings.dropdown || field.Type == AppStrings.radio)
             {
-                case AppStrings.text:
-                    fieldRenderer.RenderTextField(builder, field, userBindings, formDataToJson);
-                    break;
-
-                case AppStrings.email:
-                    fieldRenderer.RenderEmailField(builder, field, userBindings, formDataToJson);
-                    break;
-
-                case AppStrings.number:
-                    fieldRenderer.RenderNumberField(builder, field, userBindings, formDataToJson);
-                    break;
-
-                case AppStrings.dropdown:
-                    fieldRenderer.RenderDropdownField(builder, field, userBindings, formDataToJson);
-                    break;
-
-                case AppStrings.checkbox:
-                    fieldRenderer.RenderCheckboxField(builder, field, userBindings, formDataToJson);
-                    break;
-
-                case AppStrings.date:
-                    fieldRenderer.RenderDateField(builder, field, userBindings, formDataToJson);
-                    break;
-
-                case AppStrings.datetime:
-                    fieldRenderer.RenderDateTimeField(builder, field, userBindings, formDataToJson);
-                    break;
-
-                case AppStrings.time:
-                    fieldRenderer.RenderTimeField(builder, field, userBindings, formDataToJson);
-                    break;
-
-                case AppStrings.range:
-                    fieldRenderer.RenderRangeField(builder, field, userBindings, formDataToJson);
-                    break;
-
-                case AppStrings.radio:
-                    
-                    fieldRenderer.RenderRadioField(builder, field, userBindings, formDataToJson);
-                    
-                    break;
-
-                case AppStrings.color:
-                    fieldRenderer.RenderColorField(builder, field, userBindings, formDataToJson);
-                    break;
-
-                default:
-                    break;
+                builder.AddAttribute(6, "Values", field.Values);
             }
 
-
-            builder.CloseComponent();
+            builder.CloseComponent(); 
+            builder.CloseRegion();
         };
 
         private void HandleValidSubmit()
         {
             form.Validate();
-            bool isEmailValid = validation.ValidateEmail(userBindings.UserEmail);
-            
 
-            if (!isEmailValid && isRequired)
+            bool isEmailValid = false;
+
+            if (formDataToJson["Email"] != null)
+            {
+                isEmailValid = validation.ValidateEmail(formDataToJson["Email"].ToString());
+            }
+
+
+            if ((!isEmailValid && isRequired) || !form.IsValid)
             {
 
                 jsonResponse = AppStrings.InvalidFormInput;

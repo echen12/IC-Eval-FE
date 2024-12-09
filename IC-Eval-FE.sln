@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IC-Eval-FE", "IC-Eval-FE.csproj", "{4F9FC7AA-9B5A-426A-B20F-7FA470150276}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IC-Eval-FE", "IC-Eval-FE.csproj", "{4F9FC7AA-9B5A-426A-B20F-7FA470150276}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IC-Eval-BE", "..\IC-Eval-BE\IC-Eval-BE.csproj", "{53DC2714-667D-41FC-95DE-124BA3D07171}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{4F9FC7AA-9B5A-426A-B20F-7FA470150276}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F9FC7AA-9B5A-426A-B20F-7FA470150276}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F9FC7AA-9B5A-426A-B20F-7FA470150276}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53DC2714-667D-41FC-95DE-124BA3D07171}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53DC2714-667D-41FC-95DE-124BA3D07171}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53DC2714-667D-41FC-95DE-124BA3D07171}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53DC2714-667D-41FC-95DE-124BA3D07171}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
